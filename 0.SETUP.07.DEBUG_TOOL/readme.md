@@ -13,10 +13,11 @@ feature to OpenOCD: GDB.
 
 ### Why use GDB ?
 GDB is a well known and powerful debug tool available on ARM architecture.
-It support all of expected debugging feature. I use it on a terminal with
+It support all expected debugging feature. I use it on a terminal with
 `layout src` to follow the code flow.
 
 ## Hardware debug tool
 For this project I use an STM32F303 discovery kit.
 This discovery kit is delivered with an in board st-link interface.
 Again, you can chose any tool you like.
+If you are working on STM32 you will likely use a st-linkv3.

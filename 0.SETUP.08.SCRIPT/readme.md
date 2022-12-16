@@ -15,7 +15,6 @@ Not needed to flash but needed to launch a debug session.
 A script of command to enter in debug mode while openOCD is launch in the 
 background (openocd_launch.sh).
 
-
 ## Why use scripts ?
 Those steps are easy to write but it is really annoying to repeat them each 
 time.

@@ -18,3 +18,4 @@ You can use JTAG ore SWD or any protocol to debug your microcontroller.
 For this project I use an STM32F303 discovery kit.
 This discovery kit is delivered with an in board st-link interface.
 Again, you can chose any tool you like.
+If you are working on STM32 you will likely use a st-linkv3.
