@@ -9,51 +9,45 @@
         |
         |______> main.c
         |
-        |______> mcu
-        |       |
-        |       |____> setup clock
-        |       |
-        |       |____> setup pwm
-        |       |
-        |       |____> setup uart
-        |       |
-        |       |____> setup i2c
-        |       |
-        |       |____> etc...
-        |
-        |______> sensors
-        |       |
-        |       |____> setup communication
-        |       |
-        |       |____> setup motors
-        |       |
-        |       |____> setup gyro
-        |       |
-        |       |____> setup acc
-        |       |
-        |       |____> etc...
-        |
         |______> application (drone)
-                |
-                |____> start
-                |
-                |____> move
-                |
-                |____> balance
-                |
-                |____> stop
-                |
-                |____> etc...
+        |       |
+        |       |____> commands
+        |       |
+        |       |____> balance
+        |       |
+        |       |____> etc...
+        |
+        |______> features
+        |       |
+        |       |____> communication
+        |       |
+        |       |____> motors
+        |       |
+        |       |____> gyroscope
+        |       |
+        |       |____> accelerometer
+        |       |
+        |       |____> etc...
+        |
+        |______> mcu
+               |
+               |____> clock
+               |
+               |____> pwm
+               |
+               |____> uart
+               |
+               |____> i2c
+               |
+               |____> etc...
+
 
 ## Explanation
-### mcu
-In the `mcu` repository we will setup the microcontroller communication 
-interfaces.
-
-### Sensors
-In the `sensors` repository we will translate raw data received to actual 
-information we need. We will also translate informations transmitted to actual 
-raw data.
-
 ### Application
 In the `drone application` repository we will code the drone behavior using informations gathered.
+
+### Features
+In the `feature` repository we will code the feature the application rely on to work.
+
+### MCU
+In the `mcu` repository we will setup the microcontroller configuration the features relies on to work.
