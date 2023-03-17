@@ -1,0 +1,42 @@
+#include "clock_hat.h"
+
+#include "stm32f30x_flash.h"
+#include "stm32f30x_rcc.h"
+
+uint32_t clock_initialize(const struct clock_config_hat *const clock_config) {
+  RCC_ClocksTypeDef clocks;
+  /* Enabling HSI clock */
+  RCC_HSICmd(ENABLE);
+  /* Waiting HSI clock to be ready */
+  while (RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET)
+    ;
+  /* Switching systemclock to HSI clock */
+  RCC_SYSCLKConfig(RCC_SYSCLKSource_HSI);
+  /* Checking if we got the right clock source */
+  if (RCC_GetSYSCLKSource() == RCC_CFGR_SW_HSI) {
+    /* Everything if OK */
+  }
+  /* Setting AHB periph clock to HSI speed */
+  RCC_HCLKConfig(RCC_HCLK_Div1);
+  /* Setting APB periph clock to HSI speed */
+  RCC_PCLK1Config(RCC_HCLK_Div1);
+  /* Now we check if we got expected clock frequency */
+  RCC_GetClocksFreq(&clocks);
+  if (clocks.HCLK_Frequency == HSI_VALUE) {
+    /* Everything if OK */
+  }
+  if (clocks.PCLK1_Frequency == HSI_VALUE) {
+    /* Everything if OK */
+  }
+  if (clocks.SYSCLK_Frequency == HSI_VALUE) {
+    /* Everything if OK */
+  }
+  if (clocks.USART1CLK_Frequency == HSI_VALUE) {
+    /* Everything if OK */
+  }
+  if (clocks.USART2CLK_Frequency == HSI_VALUE) {
+    /* Everything if OK */
+  }
+  /* Set the flash latency to correctly read data from flash */
+  FLASH_SetLatency(FLASH_Latency_0);
+}

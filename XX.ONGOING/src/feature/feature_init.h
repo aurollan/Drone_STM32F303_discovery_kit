@@ -2,4 +2,4 @@
 
 #include <stdint.h>
 
-uint32_t init_mcu(void);
+uint32_t feature_initialize(void);

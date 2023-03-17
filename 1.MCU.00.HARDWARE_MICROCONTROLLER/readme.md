@@ -1,0 +1,26 @@
+# What you need to keep following this tutorial
+For the next step you will need:
+- a STM32F3/4xx family microcontroller
+Personnaly I use a STM32F303 discovery board.
+I have to say that I had a lot a bad surprise on aliexpress so I encourage 
+you to buy a discovery board on some well known and reliable retailer.
+
+    https://fr.rs-online.com/web/p/outils-de-developpement-pour-microcontroleurs/7692091
+
+If you get another board than mine (STM32F303VCT6) you should adjust your 
+linker script and your start up file. 
+This is easy, everything is in the file names.
+You shouldn't have trouble for this tutorial because every other stm32f3/4
+product have better specification than mine. But be carefull some 
+microcontroller don't have the same configuration.
+
+NOTE: Discovery board usually have an embedded st-link so you don't have to 
+buy one.
+
+- a st-link to flash your device (st-link v2 should be good)
+I bought it on aliexpress before I know there was an official product.
+Same as previous, I think an official product on reliable retailer is a better 
+idea if you don't want trouble with product shipping and reliability.
+
+    https://www.mouser.fr/ProductDetail/STMicroelectronics/ST-LINK-V2?qs=H4BOwPtf9MC1sDQ8j3cy4w%3D%3D
+

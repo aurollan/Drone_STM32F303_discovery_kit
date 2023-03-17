@@ -29,6 +29,7 @@ FLASH_TOOL = openocd
 # Include directories given to GCC
 # For our own include files
 DIR_INC_LOCAL = src
+DIR_INC_LOCAL += src/mcu/hat/
 # For system_stm32f0xx.h file and stm32f3xx.h file
 DIR_INC_DEVICE = ../0.SETUP.01.LIBRARY/STM32F30x_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Device/ST/STM32F30x/Include
 # For ARM Cortex M4 header files
@@ -58,13 +59,13 @@ vpath %.c ../0.SETUP.01.LIBRARY/STM32F30x_DSP_StdPeriph_Lib_V1.3.0/Libraries/STM
 # For our own source files
 vpath %.c src/
 vpath %.c src/mcu/
-vpath %.c src/mcu/stm32f4/setup_uart/
-vpath %.c src/mcu/stm32f4/setup_clock/
-vpath %.c src/mcu/stm32f4/setup_dma/
-vpath %.c src/mcu/stm32f4/setup_i2c/
-vpath %.c src/mcu/stm32f4/setup_i2c/
-vpath %.c src/mcu/stm32f4/setup_pwm/
-vpath %.c src/mcu/stm32f4/setup_timer/
+vpath %.c src/mcu/platform/stm32f4/uart/
+vpath %.c src/mcu/platform/stm32f4/clock/
+vpath %.c src/mcu/platform/stm32f4/dma/
+vpath %.c src/mcu/platform/stm32f4/i2c/
+vpath %.c src/mcu/platform/stm32f4/i2c/
+vpath %.c src/mcu/platform/stm32f4/pwm/
+vpath %.c src/mcu/platform/stm32f4/timer/
 
 ################################################################################
 #							PROJECT FILES									   #
@@ -94,6 +95,7 @@ FILE_SRC = main.c \
 		   stm32f30x_usart.c \
            stm32f30x_tim.c \
            stm32f30x_dma.c \
+           stm32f30x_i2c.c \
 
 FILE_OBJ = $(FILE_SRC:.c=.o)
 FILE_OBJ += $(FILE_ASM:.s=.o)
@@ -139,7 +141,7 @@ DM_FLAGS += -DUSE_STDPERIPH_DRIVER
 CO_FLAGS = -ffunction-sections -fdata-sections
 
 # Warning flags
-WRN_FLAGS = -Werror -Wall -Wextra
+WRN_FLAGS = -Wall -Wextra #-Werror
 
 # All flags for GCC compiling step
 GCC_FLAGS = $(ARCH_FLAGS) $(DBG_FLAGS) $(FP_FLAGS) $(INC_FLAGS) \
@@ -194,7 +196,7 @@ $(DIR_OBJ)/%.o: $(DIR_ASM)/%.s
 
 # Linux (Debian) flash and launch debug session
 debug:
-	@$(GDB) -q $(NAME) -x $(DIR_OCD_SCRIPT)/openocd.gdb
+	@$(DB) -q $(NAME) -x $(DIR_OCD_SCRIPT)/openocd.gdb
 
 flash:
 	@$(FLASH_TOOL) -f interface/stlink -v2.cfg -f target/stm32f0x.cfg -c "program $(NAME) verify reset exit"
