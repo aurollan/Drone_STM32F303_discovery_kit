@@ -1,10 +1,15 @@
 #pragma once
 
 #include "mcu/hat/clock_hat.h"
+#include "mcu/hat/gpio_hat.h"
 #include "mcu/hat/i2c_hat.h"
 #include "mcu/hat/pwm_hat.h"
 #include "mcu/hat/timer_hat.h"
 #include "mcu/hat/uart_hat.h"
+
+const struct gpio_config_hat gpio_config {
+  .gpio_pupd = 0,
+};
 
 const struct clock_config_hat clock_config = {
     .clock_speed = 1000000,

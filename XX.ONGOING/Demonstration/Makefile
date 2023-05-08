@@ -1,0 +1,228 @@
+# make is alias for make all
+.DEFAULT_GOAL := all
+
+# Name of recipes
+.PHONY: all llaunch mlaunch clean fclean re
+
+################################################################################
+#								PROJECT	CONFIG 								   #
+################################################################################
+
+# Selecting Core (STM32F0 DISCOVERY IS ARM M0)
+CORTEX_M = 4
+CORE = CM$(CORTEX_M)
+
+# Project name
+NAME = DEMO-DISCOVERY-$(CORE).elf
+
+# Compiler, Linker & Debugger
+CC = arm-none-eabi-gcc
+LD = arm-none-eabi-ld
+DB = arm-none-eabi-gdb
+
+# Launch debug from Linux (Ubuntu/Debian)
+GDB = gdb-multiarch
+
+# Flahs utility
+FLASH_TOOL = openocd
+
+# Include directories given to GCC
+# For our own include files
+DIR_INC_LOCAL = ./
+DIR_INC_LOCAL += Utilities/STM32F3_Discovery/
+DIR_INC_LOCAL += ../../0.SETUP.01.LIBRARY/STM32F3-Discovery_FW_V1.1.0/Libraries/STM32_USB-FS-Device_Driver/inc/
+# For system_stm32f0xx.h file and stm32f3xx.h file
+DIR_INC_DEVICE = ../../0.SETUP.01.LIBRARY/STM32F30x_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Device/ST/STM32F30x/Include
+# For ARM Cortex M4 header files
+DIR_INC_CORTEX = ../../0.SETUP.01.LIBRARY/STM32F30x_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Include
+# For Std library header files
+DIR_INC_STD_LIB = ../../0.SETUP.01.LIBRARY/STM32F30x_DSP_StdPeriph_Lib_V1.3.0/Libraries/STM32F30x_StdPeriph_Driver/inc
+# For Std library stm32f3xx_conf.h header files (if you want to use FULL_ASSERT)
+DIR_INC_STD_LIB_CONF = ../../0.SETUP.01.LIBRARY/STM32F30x_DSP_StdPeriph_Lib_V1.3.0/Projects/STM32F30x_StdPeriph_Templates
+
+# Start up file repository (I have commented a line so I made a local copy)
+DIR_ASM = ../../0.SETUP.03.STARTUP_FILE
+
+# Linker script file repository
+DIR_LKS = ../../0.SETUP.02.LINKER_SCRIPT
+
+# OpenOCD debug script file repository
+DIR_OCD_SCRIPT = ../../0.SETUP.07.SCRIPT
+
+# Object files repository
+DIR_OBJ = obj
+
+# VPATH name to find *.c files
+# For system_stm32f0xx.c file
+vpath %.c ../../0.SETUP.01.LIBRARY/STM32F30x_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Device/ST/STM32F30x/Source/Templates/
+# For Std library source file
+vpath %.c ../../0.SETUP.01.LIBRARY/STM32F30x_DSP_StdPeriph_Lib_V1.3.0/Libraries/STM32F30x_StdPeriph_Driver/src/
+# For our own source files
+vpath %.c ./
+vpath %.c Utilities/STM32F3_Discovery/
+
+################################################################################
+#							PROJECT FILES									   #
+################################################################################
+
+# Start up file name (I have commented a line so I made a local copy)
+FILE_ASM = startup_stm32f303xc.s
+
+# Linker script file name (I have commented a line so I made a local copy)
+FILE_LKS = STM32F303VC_FLASH.ld
+
+# Files used for building project
+FILE_SRC = main.c \
+  		   stm32f30x_it.c \
+  		   main.c \
+		   syscalls.c \
+  		   system_stm32f30x.c \
+		   stm32f3_discovery.c \
+		   stm32f3_discovery_l3gd20.c \
+		   stm32f3_discovery_lsm303dlhc.c \
+           stm32f30x_misc.c \
+		   stm32f30x_syscfg.c \
+           stm32f30x_gpio.c \
+           stm32f30x_i2c.c \
+           stm32f30x_rcc.c \
+           stm32f30x_spi.c \
+           stm32f30x_exti.c \
+		   usb_istr.c \
+		   usb_prop.c \
+		   usb_pwr.c \
+		   usb_endp.c \
+		   usb_desc.c \
+		   usb_core.c \
+		   usb_init.c \
+		   usb_int.c \
+		   usb_mem.c \
+		   usb_sil.c \
+		   usb_regs.c \
+		   hw_config.c \
+
+FILE_OBJ = $(FILE_SRC:.c=.o)
+FILE_OBJ += $(FILE_ASM:.s=.o)
+
+OBJ = $(addprefix $(DIR_OBJ)/, $(FILE_OBJ))
+ASM = $(addprefix $(DIR_ASM)/, $(FILE_ASM))
+# We are using vpath now so we don't have to bother with file path for
+# *.c and *.h
+# SRC = $(addprefix $(DIR_SRC)/, $(FILE_SRC))
+
+################################################################################
+#							GCC COMPILATION FLAGS							   #
+################################################################################
+
+# Architecture flags (ARM)
+ARCH_FLAGS =-mthumb -mcpu=cortex-m$(CORTEX_M) -mlittle-endian
+
+# Debug flags
+DBG_FLAGS = -g3
+
+# Floating point flags (ARM) no hardware floating point support
+FP_FLAGS =  -mfloat-abi=softfp -mfpu=fpv4-sp-d16
+
+# Include path flags
+INC_LOCAL_FLAG = $(addprefix -I , $(DIR_INC_LOCAL))
+INC_DEVICE_FLAG = $(addprefix -I , $(DIR_INC_DEVICE))
+INC_CORTEX_FLAG = $(addprefix -I , $(DIR_INC_CORTEX))
+INC_STD_LIB_FLAG = $(addprefix -I , $(DIR_INC_STD_LIB))
+INC_STD_LIB_CONF_FLAG = $(addprefix -I , $(DIR_INC_STD_LIB_CONF))
+
+# All flags together
+INC_FLAGS = $(INC_LOCAL_FLAG) $(INC_DEVICE_FLAG) $(INC_CORTEX_FLAG) \
+			$(INC_STD_LIB_FLAG) $(INC_STD_LIB_CONF_FLAG)
+
+# DEFINE/Macro flags
+DM_FLAGS = -DSTM32F303xC
+
+# Both following define come together (for using FULL_ASSERT)
+DM_FLAGS += -DUSE_FULL_ASSERT
+DM_FLAGS += -DUSE_STDPERIPH_DRIVER
+
+# Compiling Optimization flags (add -0s for best optimization flag)
+CO_FLAGS = -ffunction-sections -fdata-sections
+
+# Warning flags
+WRN_FLAGS = -Wall -Wextra #-Werror
+
+# Spec flags
+SPEC_FLAGS = -specs=nano.specs
+
+# All flags for GCC compiling step
+GCC_FLAGS = $(ARCH_FLAGS) $(DBG_FLAGS) $(FP_FLAGS) $(INC_FLAGS) \
+		  	$(DM_FLAGS) $(CO_FLAGS) $(WRN_FLAGS) $(SPEC_FLAGS)
+
+################################################################################
+#								LINKING										   #
+################################################################################
+
+# Linking Optimization flags
+LO_FLAGS = --gc-sections
+
+# Map File flags
+MAP_FLAGS = -Map=$(NAME).map
+
+# Linking Script file (I have commented 2 line a the end so I made a local copy)
+LS_FLAGS = -T$(DIR_LKS)/$(FILE_LKS)
+
+# Linking nano librarie
+# LN_FLAGS = --library-path=/usr/arm-none-eabi/lib/thumb/v7e-m+fp/hard --library=c_nano
+
+# Linking libgcc.a
+# LG_FLAGS = --library-path=/usr/lib/gcc/arm-none-eabi/12.2.0/thumb/v7e-m+fp/hard --library=gcc
+
+# Linking math library
+LM_FLAGS = --library=m
+
+# All flags for LD linking step
+LD_FLAGS = $(LS_FLAGS),$(LO_FLAGS),$(MAP_FLAGS),$(LM_FLAGS) #$(LN_FLAGS) $(LG_FLAGS)
+
+################################################################################
+#								MAKE RULES									   #
+################################################################################
+
+all: $(NAME)
+
+$(NAME): $(OBJ)
+	$(CC) $^ -o $@ $(SPEC_FLAGS) -Wl,$(LD_FLAGS)
+	@echo "\033[33;32m=== Linking $(NAME)...\t\t\tDONE\033[0m"
+	@echo "---------------------------------------------------------------------"
+
+# Build *.c file
+$(DIR_OBJ)/%.o: %.c
+	@mkdir -p obj
+	$(CC) $(GCC_FLAGS) -o $@ -c $<
+	@echo "\033[0;32m [OK] \033[0m       \033[0;33m Compiling:\033[0m" $<
+	@echo "---------------------------------------------------------------------"
+
+# Build *.s file
+$(DIR_OBJ)/%.o: $(DIR_ASM)/%.s
+	@mkdir -p obj
+	$(CC) $(GCC_FLAGS) -o $@ -c $<
+	@echo "\033[0;32m [OK] \033[0m       \033[0;33m Compiling:\033[0m" $<
+	@echo "---------------------------------------------------------------------"
+
+# Linux (Debian) flash and launch debug session
+debug:
+	@$(DB) -q $(NAME) -x $(DIR_OCD_SCRIPT)/openocd.gdb
+
+flash:
+	@$(FLASH_TOOL) -f interface/stlink.cfg -f target/stm32f3x.cfg -c "program $(NAME) verify reset exit"
+
+flash_demo:
+	@$(FLASH_TOOL) -f interface/stlink.cfg -f target/stm32f3x.cfg -c "program STM32F3_Discovery_Demo_V1.1.0.hex verify reset exit"
+
+# Delete all intermediate files
+clean:
+	@rm -rf *.map
+	@rm -rf obj
+	@echo "\033[33;32m=== Cleaning project $(DIR_OBJ) repository and $(NAME).map...\t\tDONE\033[0m"
+
+# Delete all intermediate files and executable file
+fclean: clean
+	@rm -rf $(NAME)
+	@echo "\033[33;32m=== Cleaning executable $(NAME)...\t\t\tDONE\033[0m"
+
+# Clean and rebuild project
+re: fclean all

@@ -199,7 +199,10 @@ debug:
 	@$(DB) -q $(NAME) -x $(DIR_OCD_SCRIPT)/openocd.gdb
 
 flash:
-	@$(FLASH_TOOL) -f interface/stlink -v2.cfg -f target/stm32f0x.cfg -c "program $(NAME) verify reset exit"
+	@$(FLASH_TOOL) -f interface/stlink.cfg -f target/stm32f3x.cfg -c "program $(NAME) verify reset exit"
+
+flash_demo:
+	@$(FLASH_TOOL) -f interface/stlink.cfg -f target/stm32f3x.cfg -c "program STM32F3_Discovery_Demo_V1.1.0.hex verify reset exit"
 
 # Delete all intermediate files
 clean:
